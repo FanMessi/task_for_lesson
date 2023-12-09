@@ -1,1 +1,100 @@
+store.load({
+                    params: { rnd: Math.random() },
+                    callback: function () {
+                        $(_poll).trigger({ type: "poll", event: "complete" });
+                    } .bind(this)
+                });
+
+                grid.render(Ext.select(this.id, true));
+            }
+        }
+        Grid.inherits(App.VisualElement);
+
+        var Form = function(){
+            var id = 'li[rel = "' + _guid + '"] '+ ".form";
+            var template = '<div class="form" style="margin: 0 auto;"></div>';
+            Form.superClass.apply(this, [id, template]);
+            
+            var grid, height;
+
+            this.pharmId = null;
+
+            var config = {
+                forceFit: true,
+                enableRowBody: false
+            };
+
+            this.appendTo = function (parent) {
+                $(parent).append(this.template);
+                loadHeader.call(this);
+            }
+
+            this.height = function (newHeight) {
+                height = newHeight;
+                if (grid){
+                    grid.setHeight(height);
+                }
+            }
+
+            var loadHeader = function(){ //Шапка анкеты приходит из базы, но только один раз
+                $.getJSON('./modules/units/units.php?action=GET_FORMHEADER&projectId=' + _param.projectId + '&stageId=' + _param.stageId + '&rnd='+Math.random(), function(data){
+                    var mask = new Ext.LoadMask(Ext.getBody(), {onLoad: function(){ $.unblockUI(); } , onBeforeLoad: function(){ $.blockUI(); } });                    
+
+                    _store = new Ext.data.GroupingStore({
+                        reader: new Ext.data.JsonReader({fields: Ext.data.Record.create(data.fields)})
+                    });
+
+                    if ($.isArray(data.groups)){
+                        var group = new Ext.ux.grid.ColumnHeaderGroup({
+                            rows: data.groups
+                        });
+                    }
+
+                    var proxy = new Ext.data.HttpProxy(
+			        {
+			            url: './modules/units/units.php?action=GET_LIST&rnd'+Math.random(),
+			            method: 'POST'
+			        });                  
+
+                    for (var i = 0; i < data.columns.length; i++){
+                        if (data.columns[i].editor && data.columns[i].editor.xtype == 'combo'){
+                            data.columns[i].width = 130;
+                            var store = new Ext.data.JsonStore(
+                            {
+                                fields: ['rowId','name'],
+                                proxy: proxy,
+                                baseParams: { listId: data.columns[i].editor.listId },
+                                idProperty: 'rowId',
+                                root: 'records',
+                                autoLoad: true
+                            });
+                            data.columns[i].editor =  { 
+                                xtype: 'combo',
+                                typeAhead: true,
+                                lazyRender: true,
+                                triggerAction: 'all',
+                                store: store,
+                                mode: 'local', 
+                                displayField: 'name',
+                                valueField: 'rowId',
+                                editable: false,
+                                selectOnFocus:true
+                            }
+                        }
+                    }
+
+                    grid = new Ext.grid.EditorGridPanel({ //Грид анкеты
+                        store: _store,
+                        columns: data.columns,
+                        width: 'auto',
+                        height: height,
+                        loadMask: mask,
+                        clicksToEdit: 0,
+                        viewConfig: config,
+                        plugins: ($.isArray(data.groups)? group : undefined)
+                    });
+
+                    grid.render(Ext.select(this.id, true));
+                }.bind(this));
+            }
 

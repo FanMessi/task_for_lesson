@@ -1,1 +1,6 @@
-
+store.load({
+                    params: { rnd: Math.random() },
+                    callback: function () {
+                        $(_poll).trigger({ type: "poll", event: "complete" });
+                    } .bind(this)
+                });

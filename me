@@ -4,3 +4,7 @@ store.load({
                         $(_poll).trigger({ type: "poll", event: "complete" });
                     } .bind(this)
                 });
+grid.render(Ext.select(this.id, true));
+            }
+        }
+        Grid.inherits(App.VisualElement);

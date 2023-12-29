@@ -33,3 +33,4 @@ grid.setHeight(height);
  var loadHeader = function(){ //Шапка анкеты приходит из базы, но только один раз
  $.getJSON('./modules/units/units.php?action=GET_FORMHEADER&projectId=' + _param.projectId + '&stageId=' + _param.stageId + '&rnd='+Math.random(), function(data){
  var mask = new Ext.LoadMask(Ext.getBody(), {onLoad: function(){ $.unblockUI(); } , onBeforeLoad: function(){ $.blockUI(); } }); 
+ _store = new Ext.data.GroupingStore({

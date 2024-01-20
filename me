@@ -11,22 +11,3 @@ store.load({
 Grid.inherits(App.VisualElement);
 
 var Form = function(){
-var id = 'li[rel = "' + _guid + '"] '+ ".form";
-var template = '<div class="form" style="margin: 0 auto;"></div>';
- Form.superClass.apply(this, [id, template]);
-
-        var grid, height;
-
-      this.pharmId = null;
-
- var config = {
-forceFit: true,
-enableRowBody: false
-   };
-
-this.appendTo = function (parent) {
-$(parent).append(this.template);
-loadHeader.call(this);
- }
-
-this.height = function (newHeight) {
